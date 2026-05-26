@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/martinfranciscocortesbuendia/Desktop/Escuela/GOBTI/mainPage/public/logo.png)",
+      "Bash(sips -p 648 648 logo.png --out logo-square.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight logo-square.png)",
+      "Bash(sips -g hasAlpha /Users/martinfranciscocortesbuendia/Desktop/Escuela/GOBTI/mainPage/public/logo-square.png)",
+      "Bash(magick logo.png -background none -gravity center -extent 648x648 logo-square.png)",
+      "Bash(magick logo-square.png -resize 256x256 -define icon:auto-resize=16,32,48,64,128,256 favicon.ico)"
+    ]
+  }
+}
