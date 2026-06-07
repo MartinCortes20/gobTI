@@ -46,7 +46,43 @@ const TABS: Tab[] = [
   { id: 'plan',            label: 'Plan de Continuidad',            icon: '◯' },
 ]
 
-const DRIVE_URL = '#'
+const DRIVE_URL = 'https://drive.google.com/drive/folders/1BpBr4jUQ4n0VdSRXfwKs-vA83cf0y2aQ?usp=drive_link'
+
+// ── Visor de PDFs (Google Drive) ─────────────────────────
+// Pega el ID de cada PDF: es lo que va entre /d/ y /view del enlace de compartir.
+// En Drive: clic derecho sobre el PDF → Compartir → "Cualquier persona con el enlace"
+// → Copiar vínculo. De https://drive.google.com/file/d/AQUI_VA_EL_ID/view copia el ID.
+const PDF_IDS: Partial<Record<TabId, string>> = {
+  cedula:     '1Q2S1iwt1-FP93p-qbqbvHDveLxW87nHE', // CEDULA DE SERVICIO SEGUNDA PARTE (1).pdf
+  matriz:     '1SSKJ2mtZ7XkEZ9PVYcuBqDXiA8IKXrof', // 5 Riesgos Gestion Accesos.pdf
+  plan:       '1e6QzCbYlMkToshvwQQ54Addv_KwF8ztg', // Administración de disponibilidad.pdf
+  caso:       '1vHzpZsnf-cUm5nXyTI4OXE_VFuFXlGNU', // casosnegocio.pdf
+  'metas-corp': '10lCTN6CXzZ5exCL4N1pU8kzCFFUiJubW', // MetaCorporativasMapaEstrategico (1).pdf
+  mapa:       '10lCTN6CXzZ5exCL4N1pU8kzCFFUiJubW', // MetaCorporativasMapaEstrategico (1).pdf
+  'metas-ti': '1dK7aY707LBApe8_UYgaIkf9G0ISsgVDY', // metasTI.pdf
+}
+
+interface PdfEmbedProps {
+  tabId?: TabId
+  id?: string
+  title: string
+}
+const PdfEmbed = ({ tabId, id: idProp, title }: PdfEmbedProps): JSX.Element | null => {
+  const id = idProp ?? (tabId ? PDF_IDS[tabId] : undefined)
+  if (!id) return null
+  return (
+    <div className="docs__pdf">
+      <div className="docs__pdf-bar">
+        <span className="docs__pdf-name mono">{title}</span>
+        <div className="docs__pdf-actions">
+          <a className="docs__pdf-link mono" href={`https://drive.google.com/file/d/${id}/view`} target="_blank" rel="noopener noreferrer">Abrir ↗</a>
+          <a className="docs__pdf-link mono" href={`https://drive.google.com/uc?export=download&id=${id}`} target="_blank" rel="noopener noreferrer">Descargar ↓</a>
+        </div>
+      </div>
+      <iframe className="docs__pdf-frame" src={`https://drive.google.com/file/d/${id}/preview`} title={title} />
+    </div>
+  )
+}
 
 // ── Helpers ──────────────────────────────────────────────
 interface PendingCardProps {
@@ -302,6 +338,7 @@ const TabMetasCorp = (): JSX.Element => (
         Una meta corporativa por cada dimensión del <strong>Balanced Scorecard</strong>,
         mapeada con el catálogo COBIT.
       </p>
+      <PdfEmbed tabId="metas-corp" title="Metas corporativas y mapa estratégico.pdf" />
       <PendingCard
         title="Metas corporativas — 1 por dimensión BSC"
         description="Tabla con las 4 metas corporativas (Financiera, Cliente, Procesos internos, Aprendizaje y crecimiento) alineadas al catálogo COBIT."
@@ -319,6 +356,7 @@ const TabMetasTI = (): JSX.Element => (
         Una meta de TI por cada dimensión del <strong>Balanced Scorecard</strong>,
         derivada de las metas corporativas y mapeada con el catálogo COBIT.
       </p>
+      <PdfEmbed tabId="metas-ti" title="Metas de TI.pdf" />
       <PendingCard
         title="Metas de TI — 1 por dimensión BSC"
         description="Tabla con las 4 metas de TI (Financiera, Cliente, Procesos internos, Aprendizaje y crecimiento) alineadas al catálogo COBIT."
@@ -354,6 +392,7 @@ const TabMapa = (): JSX.Element => (
         <strong>una meta de TI</strong> seleccionadas, visualizando relaciones causa-efecto
         entre las cuatro dimensiones del Balanced Scorecard.
       </p>
+      <PdfEmbed tabId="mapa" title="Metas corporativas y mapa estratégico.pdf" />
       <PendingCard
         title="Mapa estratégico"
         description="Mapa estratégico con 1 meta corporativa y 1 meta de TI seleccionadas, mostrando relaciones causa-efecto entre las dimensiones del BSC."
@@ -443,6 +482,7 @@ const TabCaso = (): JSX.Element => (
 
     <div className="docs__section">
       <h3 className="docs__h3">Caso de Negocio — formato completo</h3>
+      <PdfEmbed tabId="caso" title="Caso de negocio.pdf" />
       <PendingCard
         title="Caso de Negocio (formato institucional)"
         description="Documento formal con problema, solución propuesta, alternativas evaluadas, análisis costo-beneficio, ROI, supuestos y restricciones."
@@ -500,11 +540,13 @@ const TabCedula = (): JSX.Element => (
             </p>
           </div>
         </div>
+        <PdfEmbed id="1SprNVTBycMKsbLVEVZ9vjBY51_SgJhe5" title="Cédula de servicio — Gestión de accesos.pdf" />
       </Deliverable>
     </div>
 
     <div className="docs__section">
       <h3 className="docs__h3">Cédula ITIL completa</h3>
+      <PdfEmbed tabId="cedula" title="Cédula de servicio — Gestión de accesos.pdf" />
       <PendingCard
         title="Cédula de servicio ITIL — formato completo"
         description="Documento ITIL con todos los campos formales: alcance detallado, SLA, OLAs, propietario, gestor, procesos relacionados, métricas, KPIs, dependencias y horario de operación."
@@ -581,6 +623,7 @@ const TabMatriz = (): JSX.Element => (
 
     <div className="docs__section">
       <h3 className="docs__h3">Matriz CID</h3>
+      <PdfEmbed tabId="matriz" title="5 Riesgos Gestión Accesos.pdf" />
       <PendingCard
         title="Matriz CID (Confidencialidad · Integridad · Disponibilidad)"
         description="Matriz formal ISO 27000 con valoración por activo en las tres dimensiones CID, controles aplicables del Anexo A y nivel de riesgo residual."
@@ -656,6 +699,7 @@ const TabPlan = (): JSX.Element => (
         de respuesta y recuperación, comunicación de crisis y plan de pruebas y
         mantenimiento.
       </p>
+      <PdfEmbed tabId="plan" title="Administración de disponibilidad.pdf" />
       <PendingCard
         title="Plan de Continuidad del Negocio (BCP)"
         description="Documento formal con fases del plan, roles, procedimientos de respuesta y recuperación, comunicación de crisis y plan de pruebas y mantenimiento."
